@@ -1,4 +1,17 @@
 # bambasTop
+Frontend
+REACTJS
+TAILWIND
 
-mhxhjfjfjhj,jh,jhc,h
-´ñfiuljf.kug
+Backend
+NODEJS
+
+BBDD
+MONGODB
+
+Software
+NODE
+GIT
+DOCKER
+DOCKER-COMPOSE
+POSTMAN
