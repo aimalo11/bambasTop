@@ -1,0 +1,19 @@
+# ADR-002: Estructura inicial del projecte
+
+## Context
+Necessitem organitzar el projecte de manera que faciliti el desenvolupament en equip i la integració de backend i frontend.  
+Tenim opcions: utilitzar **un monorepo** (tot el codi en un sol repositori) o **repositoris separats** (un per al backend i un altre per al frontend).
+
+## Decisió
+Per simplicitat inicial i per poder lliurar més ràpid, utilitzarem **repositoris separats**:
+- Un repositori per al **backend** (API, models, lògica de negoci).
+- Un repositori per al **frontend** (interfície web).
+
+## Conseqüències
+**Positives**
+- Permet desplegar backend i frontend de manera independent.
+- Cada equip pot treballar en el seu repositori sense conflictes de dependències.
+
+**Negatives**
+- Més complexitat a l’hora de sincronitzar versions entre backend i frontend.
+- Alguna duplicació de configuracions (p.ex. Docker, linter, etc.).
