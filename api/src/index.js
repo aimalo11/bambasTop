@@ -1,19 +1,21 @@
 require('dotenv').config();
 const express = require('express');
 const connectDB = require('./config/db');
+
 const productRoutes = require('./routes/productRoutes');
+const userRoutes = require('./routes/usuariRoutes');
 
 const app = express();
 app.use(express.json());
 
-// Conectar a MongoDB
+// Conectar base de datos
 connectDB();
 
-// Ruta raíz
-app.get('/', (req, res) => res.send('API Ecommerce en marxa 🚀'));
-
-// Montar rutas de productos bajo '/api/products'
+// Rutas
 app.use('/api/products', productRoutes);
+app.use('/api/users', userRoutes);
+
+app.get('/', (req, res) => res.send('API Ecommerce en marxa 🚀'));
 
 // Servidor
 const PORT = process.env.PORT || 3001;
