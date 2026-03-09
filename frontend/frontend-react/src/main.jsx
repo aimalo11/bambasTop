@@ -6,6 +6,8 @@ import App from './App.jsx'
 import Home from './pages/Home.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
+import ProductDetail from './pages/ProductDetail.jsx'
+import Checkout from './pages/Checkout.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 
@@ -16,6 +18,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route index element={<Home />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
+          <Route path="product/:id" element={<ProductDetail />} />
+          <Route path="checkout" element={<Checkout />} />
         </Route>
       </Routes>
     </BrowserRouter>
