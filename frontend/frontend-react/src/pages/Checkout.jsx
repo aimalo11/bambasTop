@@ -39,7 +39,14 @@ export default function Checkout() {
         setLoading(true);
 
         fetch('/api/cart/checkout', {
-            method: 'POST'
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ...formData,
+                cart
+            })
         })
             .then(res => {
                 if (!res.ok) throw new Error("Server error");
