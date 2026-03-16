@@ -6,9 +6,18 @@ const createProduct = async (productData) => {
   return await newProduct.save();
 };
 
-// Obtener todos los productos
-const getAllProducts = async () => {
-  return await Product.find();
+// Obtener todos los productos con filtros
+const getAllProducts = async (filters = {}) => {
+  const query = {};
+  if (filters.name) {
+    query.name = { $regex: filters.name, $options: 'i' };
+  }
+  if (filters.minPrice || filters.maxPrice) {
+    query.price = {};
+    if (filters.minPrice) query.price.$gte = Number(filters.minPrice);
+    if (filters.maxPrice) query.price.$lte = Number(filters.maxPrice);
+  }
+  return await Product.find(query);
 };
 
 // Obtener producto por id
@@ -26,4 +35,4 @@ const deleteProduct = async (id) => {
   return await Product.findByIdAndDelete(id);
 };
 
-module.exports = {createProduct, getAllProducts, getProductById, updateProduct, deleteProduct};
+module.exports = { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct };
