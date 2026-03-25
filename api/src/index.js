@@ -1,10 +1,13 @@
 require('dotenv').config();
 const express = require('express');
 const connectDB = require('./config/db');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./docs/swagger');
 
 const productRoutes = require('./routes/productRoutes');
 const userRoutes = require('./routes/usuariRoutes');
 const cistellaRoutes = require('./routes/cistellaRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 app.use(express.json());
@@ -16,8 +19,12 @@ connectDB();
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/cart', cistellaRoutes);
+app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => res.send('API Ecommerce en marxa 🚀'));
+
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Servidor
 const PORT = process.env.PORT || 3001;
