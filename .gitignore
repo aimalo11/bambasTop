@@ -1,0 +1,7 @@
+node_modules/
+api/node_modules/
+frontend/frontend-react/node_modules/
+dist/
+build/
+.env
+.env.*

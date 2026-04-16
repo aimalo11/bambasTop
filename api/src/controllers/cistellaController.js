@@ -1,14 +1,20 @@
 const Cistella = require('../models/Cistella');
 const Orden = require('../models/orden');
+const Product = require('../models/Product');
+
+const getOrCreateUserCart = async (userId) => {
+    let cart = await Cistella.findOne({ user: userId });
+    if (!cart) {
+        cart = await Cistella.create({ user: userId, items: [] });
+    }
+    return cart;
+};
 
 // Obtener carrito (o crear uno si no existe)
 exports.getCart = async (req, res) => {
     try {
-        let cart = await Cistella.findOne().sort({ updatedAt: -1 });
-        if (!cart) {
-            cart = new Cistella({ items: [] });
-            await cart.save();
-        }
+        const userId = req.user.id;
+        const cart = await getOrCreateUserCart(userId);
         res.json(cart);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -17,13 +23,34 @@ exports.getCart = async (req, res) => {
 
 // Añadir item
 exports.addToCart = async (req, res) => {
-    const { productoId, nombre, precio } = req.body;
+    const { productoId } = req.body;
     try {
-        let cart = await Cistella.findOne().sort({ updatedAt: -1 });
-        if (!cart) {
-            cart = new Cistella({ items: [] });
+        const userId = req.user.id;
+        const product = await Product.findById(productoId);
+        if (!product) {
+            return res.status(404).json({ message: 'Producte no trobat' });
         }
-        cart.items.push({ productoId, nombre, precio });
+
+        const cart = await getOrCreateUserCart(userId);
+        const existingItem = cart.items.find((item) => item.productoId === String(product._id));
+        const nextQuantity = existingItem ? existingItem.quantity + 1 : 1;
+        if (product.stock < nextQuantity) {
+            return res.status(400).json({ message: 'Stock insuficient per aquest producte' });
+        }
+
+        if (existingItem) {
+            existingItem.quantity = nextQuantity;
+            existingItem.precio = Number(product.price);
+            existingItem.nombre = product.name;
+        } else {
+            cart.items.push({
+                productoId: String(product._id),
+                nombre: product.name,
+                precio: Number(product.price),
+                quantity: 1
+            });
+        }
+
         await cart.save();
         res.json(cart);
     } catch (error) {
@@ -34,8 +61,9 @@ exports.addToCart = async (req, res) => {
 // Eliminar item por ID
 exports.removeFromCart = async (req, res) => {
     try {
+        const userId = req.user.id;
         const { id } = req.params;
-        let cart = await Cistella.findOne().sort({ updatedAt: -1 });
+        const cart = await getOrCreateUserCart(userId);
         if (cart) {
             cart.items.pull({ _id: id });
             await cart.save();
@@ -49,18 +77,38 @@ exports.removeFromCart = async (req, res) => {
 // Realitzar checkout (buidar cistella)
 exports.checkout = async (req, res) => {
     try {
+        const userId = req.user.id;
+        const { name, email, address, cart } = req.body;
+        if (!Array.isArray(cart) || cart.length === 0) {
+            return res.status(400).json({ status: 'error', message: 'La cistella no pot estar buida' });
+        }
+        if (!name || !email || !address) {
+            return res.status(400).json({ status: 'error', message: 'Falten dades d\'enviament' });
+        }
 
-        const { name, email, address, cardNumber, cart } = req.body;
+        const total = cart.reduce((sum, item) => {
+            const quantity = Number(item.quantity || 1);
+            return sum + (Number(item.precio) * quantity);
+        }, 0);
 
-        const total = cart.reduce((sum, item) => sum + Number(item.precio), 0);
+        const products = cart.map((item) => {
+            const quantity = Number(item.quantity || 1);
+            const price = Number(item.precio);
+            return {
+                product: item.productoId,
+                name: item.nombre,
+                price,
+                quantity,
+                subtotal: price * quantity
+            };
+        });
 
         const orden = new Orden({
-            name,
-            email,
-            address,
-            cardNumber,
-            items: cart,
-            total
+            user: userId,
+            shipping: { name, email, address },
+            products,
+            total,
+            status: 'pending'
         });
 
         await orden.save();
@@ -76,5 +124,17 @@ exports.checkout = async (req, res) => {
             status: "error",
             message: "Error al guardar la orden"
         });
+    }
+};
+
+exports.clearCart = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const cart = await getOrCreateUserCart(userId);
+        cart.items = [];
+        await cart.save();
+        res.json({ message: 'Cistella buidada correctament' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };

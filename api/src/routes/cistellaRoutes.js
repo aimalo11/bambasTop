@@ -32,9 +32,11 @@ router.get('/', authMiddleware, cartController.getCart);
  *           schema:
  *             type: object
  *             properties:
- *               productId:
+ *               productoId:
  *                 type: string
- *               quantitat:
+ *               nombre:
+ *                 type: string
+ *               precio:
  *                 type: number
  *     responses:
  *       200:
@@ -55,6 +57,8 @@ router.post('/add', authMiddleware, cartController.addToCart);
  *         description: Compra realitzada amb èxit
  */
 router.post('/checkout', authMiddleware, cartController.checkout);
+
+router.delete('/clear', authMiddleware, cartController.clearCart);
 
 /**
  * @swagger

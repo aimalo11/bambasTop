@@ -17,7 +17,7 @@ const authController = require('../controllers/authController');
  *           schema:
  *             type: object
  *             properties:
- *               nom:
+ *               name:
  *                 type: string
  *               email:
  *                 type: string
@@ -69,7 +69,7 @@ router.post('/login', authController.login);
  *           schema:
  *             type: object
  *             properties:
- *               token:
+ *               refreshToken:
  *                 type: string
  *     responses:
  *       200:

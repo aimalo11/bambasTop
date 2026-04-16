@@ -10,7 +10,7 @@ const options = {
     }, 
     servers: [ 
       { 
-        url: "http://localhost:3000" 
+        url: "http://localhost:3001" 
       } 
     ],
     components: {
@@ -33,11 +33,13 @@ const options = {
         Product: {
           type: "object",
           properties: {
-            nom: { type: "string" },
-            descripcio: { type: "string" },
-            preu: { type: "number" },
+            name: { type: "string" },
+            description: { type: "string" },
+            price: { type: "number" },
             stock: { type: "number" },
-            imatge: { type: "string" }
+            image: { type: "string" },
+            category: { type: "string", enum: ['Running', 'Casual', 'Sport', 'Formal', 'Other'] },
+            sku: { type: "string", example: "NKE-AF1" }
           }
         }
         // Pots afegir més schemas aquí, per exemple un de Producte o Cistella

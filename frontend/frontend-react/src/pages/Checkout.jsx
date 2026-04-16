@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { loadStripe } from '@stripe/stripe-js';
 import './Checkout.css';
 
 export default function Checkout() {
@@ -9,13 +10,17 @@ export default function Checkout() {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
-        address: '',
-        cardNumber: ''
+        address: ''
     });
+    const [error, setError] = useState('');
 
     useEffect(() => {
-        // Load cart from backend or local fallback
-        fetch('/api/cart')
+        const token = localStorage.getItem('accessToken');
+        fetch('/api/cart', {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
             .then(res => {
                 if (!res.ok) throw new Error("Server down");
                 return res.json();
@@ -34,40 +39,75 @@ export default function Checkout() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handlePayment = (e) => {
+    const handlePayment = async (e) => {
         e.preventDefault();
-        setLoading(true);
+        setError('');
 
-        fetch('/api/cart/checkout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                ...formData,
-                cart
-            })
-        })
-            .then(res => {
-                if (!res.ok) throw new Error("Server error");
-                return res.json();
-            })
-            .then(data => {
-                localStorage.removeItem('cart');
-                alert('🎉 Pagament completat amb èxit! Gràcies per la teva comanda.');
-                navigate('/');
-            })
-            .catch(err => {
-                console.error("Error during checkout:", err);
-                localStorage.removeItem('cart');
-                alert('🎉 Pagament local completat amb èxit! (Servidor no disponible)');
-                navigate('/');
-            })
-            .finally(() => setLoading(false));
+        if (!formData.name || !formData.email || !formData.address) {
+            setError('Omple tots els camps obligatoris.');
+            return;
+        }
+        if (cart.length === 0) {
+            setError('La cistella no pot estar buida.');
+            return;
+        }
+
+        setLoading(true);
+        const token = localStorage.getItem('accessToken');
+
+        try {
+            const orderResponse = await fetch('/api/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    shipping: formData,
+                    products: cart
+                })
+            });
+
+            if (!orderResponse.ok) {
+                const data = await orderResponse.json().catch(() => ({}));
+                throw new Error(data.message || 'No s\'ha pogut crear la comanda');
+            }
+            const orderData = await orderResponse.json();
+
+            const sessionResponse = await fetch('/api/checkout/create-session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    shipping: formData,
+                    products: cart,
+                    orderId: orderData?.order?._id
+                })
+            });
+
+            const sessionData = await sessionResponse.json().catch(() => ({}));
+            if (!sessionResponse.ok || !sessionData.sessionId) {
+                throw new Error(sessionData.message || 'No s\'ha pogut iniciar Stripe Checkout');
+            }
+
+            const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+            if (!stripe) throw new Error('No s\'ha pogut carregar Stripe');
+
+            const result = await stripe.redirectToCheckout({ sessionId: sessionData.sessionId });
+            if (result?.error) {
+                throw new Error(result.error.message || 'Error redirigint a Stripe');
+            }
+        } catch (err) {
+            setError(err.message || 'Error en el pagament');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const calculateTotal = () => {
-        return cart.reduce((total, item) => total + Number(item.precio), 0);
+        return cart.reduce((total, item) => total + (Number(item.precio) * Number(item.quantity || 1)), 0);
     };
 
     if (cart.length === 0) {
@@ -82,10 +122,11 @@ export default function Checkout() {
     return (
         <div className="checkout-container fade-in">
             <h1 className="checkout-title">Finalitzar Compra</h1>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
 
             <div className="checkout-grid">
                 <div className="checkout-form-section">
-                    <h3>Dades d\'enviament i pagament</h3>
+                    <h3>Dades d\'enviament</h3>
                     <form onSubmit={handlePayment} className="checkout-form">
                         <div className="form-group">
                             <label>Nom complet</label>
@@ -99,13 +140,8 @@ export default function Checkout() {
                             <label>Adreça d\'enviament</label>
                             <input type="text" name="address" required value={formData.address} onChange={handleChange} placeholder="Carrer, Número, Ciutat" />
                         </div>
-                        <div className="form-group">
-                            <label>Número de targeta</label>
-                            <input type="text" name="cardNumber" required value={formData.cardNumber} onChange={handleChange} placeholder="XXXX XXXX XXXX XXXX" maxLength="16" />
-                        </div>
-
                         <button type="submit" className="btn btn-primary pay-btn" disabled={loading}>
-                            {loading ? 'Processant...' : `Pagar ${calculateTotal()}€`}
+                            {loading ? 'Processant...' : `Anar a Stripe (${calculateTotal().toFixed(2)}€)`}
                         </button>
                     </form>
                 </div>
@@ -115,14 +151,14 @@ export default function Checkout() {
                     <div className="summary-items">
                         {cart.map((item, index) => (
                             <div key={item._id || index} className="summary-item">
-                                <span>{item.nombre}</span>
-                                <span>{item.precio}€</span>
+                                <span>{item.nombre} x {item.quantity || 1}</span>
+                                <span>{(Number(item.precio) * Number(item.quantity || 1)).toFixed(2)}€</span>
                             </div>
                         ))}
                     </div>
                     <div className="summary-total">
                         <span>Total:</span>
-                        <span>{calculateTotal()}€</span>
+                        <span>{calculateTotal().toFixed(2)}€</span>
                     </div>
                 </div>
             </div>

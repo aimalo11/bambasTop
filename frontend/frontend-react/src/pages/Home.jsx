@@ -11,9 +11,14 @@ export default function Home() {
   const [filters, setFilters] = useState({});
 
   useEffect(() => {
-    fetch('/api/cart')
+    const token = localStorage.getItem('accessToken');
+    fetch('/api/cart', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
       .then(res => {
-        if (!res.ok) throw new Error("Server down");
+        if (!res.ok) throw new Error("Server down or unauthorized");
         return res.json();
       })
       .then(data => {
@@ -70,18 +75,20 @@ export default function Home() {
 
   const addToCart = (product) => {
     const item = {
-      productoId: product._id,
-      nombre: product.name,
-      precio: Number(product.price)
+      productoId: String(product._id)
     };
 
+    const token = localStorage.getItem('accessToken');
     fetch('/api/cart/add', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
       body: JSON.stringify(item)
     })
       .then(res => {
-        if (!res.ok) throw new Error("Server error");
+        if (!res.ok) throw new Error("Server error or unauthorized");
         return res.json();
       })
       .then(data => {
@@ -90,7 +97,14 @@ export default function Home() {
       })
       .catch(err => {
         console.error("Error adding to cart, using local fallback:", err);
-        const newCart = [...cart, { ...item, _id: Date.now().toString() }];
+        const existing = cart.find((cartItem) => cartItem.productoId === item.productoId);
+        const newCart = existing
+          ? cart.map((cartItem) =>
+              cartItem.productoId === item.productoId
+                ? { ...cartItem, quantity: (cartItem.quantity || 1) + 1 }
+                : cartItem
+            )
+          : [...cart, { ...item, _id: Date.now().toString(), nombre: product.name, precio: Number(product.price), quantity: 1 }];
         setCart(newCart);
         localStorage.setItem('cart', JSON.stringify(newCart));
         setIsCartOpen(true);
@@ -98,11 +112,15 @@ export default function Home() {
   };
 
   const removeFromCart = (itemId) => {
+    const token = localStorage.getItem('accessToken');
     fetch(`/api/cart/${itemId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     })
       .then(res => {
-        if (!res.ok) throw new Error("Server error");
+        if (!res.ok) throw new Error("Server error or unauthorized");
         return res.json();
       })
       .then(data => {
@@ -121,13 +139,13 @@ export default function Home() {
   };
 
   const handleCheckout = () => {
-    navigate('/checkout');
+    navigate('/cart');
     setIsCartOpen(false);
   };
 
   const calculateTotal = () => {
     return cart.reduce((total, item) => {
-      return total + Number(item.precio);
+      return total + (Number(item.precio) * Number(item.quantity || 1));
     }, 0);
   };
 
@@ -203,7 +221,9 @@ export default function Home() {
                   <li key={item._id || index} className="cart-item">
                     <div>
                       <div style={{ fontWeight: 'bold' }}>{item.nombre}</div>
-                      <div style={{ color: '#666', fontSize: '0.9em' }}>{item.precio}€</div>
+                      <div style={{ color: '#666', fontSize: '0.9em' }}>
+                        {item.precio}€ x {item.quantity || 1}
+                      </div>
                     </div>
                     <button
                       onClick={() => removeFromCart(item._id)}
