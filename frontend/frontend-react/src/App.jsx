@@ -37,6 +37,10 @@ export default function App() {
         <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
           {user ? (
             <>
+              {user.role === 'admin' && (
+                <Link to="/admin" style={{ color: "#2196F3", fontWeight: "bold" }}>Admin</Link>
+              )}
+              <Link to="/dashboard">El meu compte</Link>
               <span style={{ fontWeight: "bold", color: "#4CAF50" }}>Hola, {user.name}</span>
               <button 
                 onClick={handleLogout}

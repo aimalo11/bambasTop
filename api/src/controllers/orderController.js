@@ -71,4 +71,25 @@ exports.createOrder = async (req, res) => {
     }
 };
 
+// Obtenir comandes de l'usuari loguejat
+exports.getMyOrders = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const orders = await Order.find({ user: userId }).sort({ createdAt: -1 });
+        res.json(orders);
+    } catch (error) {
+        res.status(500).json({ message: 'Error obtenint les teves comandes', error: error.message });
+    }
+};
+
+// Obtenir TOTES les comandes (només Admin)
+exports.getAllOrders = async (req, res) => {
+    try {
+        const orders = await Order.find().populate('user', 'name email').sort({ createdAt: -1 });
+        res.json(orders);
+    } catch (error) {
+        res.status(500).json({ message: 'Error obtenint totes les comandes', error: error.message });
+    }
+};
+
 exports.sanitizeProducts = sanitizeProducts;

@@ -2,6 +2,21 @@ const express = require('express');
 const router = express.Router();
 const usuariController = require('../controllers/usuariController');
 const authMiddleware = require('../middleware/authMiddleware');
+const roleMiddleware = require('../middleware/roleMiddleware');
+
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Obtenir tots els usuaris (Admin)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Llista d'usuaris
+ */
+router.get('/', authMiddleware, roleMiddleware('admin'), usuariController.getAllUsers);
 
 /**
  * @swagger

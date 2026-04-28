@@ -43,4 +43,8 @@ const getUserById = async (id) => {
   return await Usuari.findById(id).select('-password');
 };
 
-module.exports = { registerUser, loginUser, getUserById };
+const getAllUsers = async () => {
+  return await Usuari.find().select('-password');
+};
+
+module.exports = { registerUser, loginUser, getUserById, getAllUsers };

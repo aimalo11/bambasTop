@@ -11,6 +11,8 @@ import Checkout from './pages/Checkout.jsx'
 import Cart from './pages/Cart.jsx'
 import CheckoutSuccess from './pages/CheckoutSuccess.jsx'
 import CheckoutCancel from './pages/CheckoutCancel.jsx'
+import UserDashboard from './pages/UserDashboard.jsx'
+import AdminDashboard from './pages/AdminDashboard.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 
@@ -26,6 +28,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="checkout" element={<Checkout />} />
           <Route path="checkout/success" element={<CheckoutSuccess />} />
           <Route path="checkout/cancel" element={<CheckoutCancel />} />
+          <Route path="dashboard" element={<UserDashboard />} />
+          <Route path="admin" element={<AdminDashboard />} />
         </Route>
       </Routes>
     </BrowserRouter>
