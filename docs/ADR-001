@@ -1,0 +1,18 @@
+# ADR-001: Base de dades del projecte
+
+## Context
+Necessitem una base de dades flexible i escalable per a emmagatzemar usuaris, productes, carrets i comandes de BambasTop.  
+Com que el projecte pot créixer ràpidament i afegir nous camps (p.ex. ressenyes, mètodes d’enviament, etc.), volem evitar esquemes massa rígids.
+
+## Decisió
+Farem servir **MongoDB** com a base de dades principal, gestionada via **Docker** en l’entorn de desenvolupament.
+
+## Conseqüències
+**Positives**
+- Flexibilitat per afegir nous camps i entitats sense canviar l’esquema.
+- Integració senzilla amb **Node.js / Express**.
+- Compatible amb llibreries ORM com **Mongoose**.
+
+**Negatives**
+- Menys adequat per a consultes molt relacionals complexes.
+- Pot requerir més atenció per garantir la coherència entre col·leccions.

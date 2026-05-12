@@ -1,0 +1,52 @@
+.dashboard-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.profile-card {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    margin-bottom: 30px;
+}
+
+.orders-list {
+    display: grid;
+    gap: 20px;
+}
+
+.order-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.status-badge.paid { background: #e8f5e9; color: #2e7d32; }
+.status-badge.pending { background: #fff3e0; color: #ef6c00; }
+.status-badge.cancelled { background: #ffebee; color: #c62828; }
+
+.mini-product {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 5px;
+}

@@ -1,0 +1,48 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: ecommerce-mongodb-dev
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-root}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-password}
+    volumes:
+      - mongo-data-dev:/data/db
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: ecommerce-backend-dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - MONGO_URI=mongodb://${MONGO_USER:-root}:${MONGO_PASSWORD:-password}@mongodb:27017/ecommerce?authSource=admin
+      - PORT=3001
+      - JWT_SECRET=${JWT_SECRET:-super-secret-key}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-1d}
+      - FRONTEND_URL=http://localhost:5173
+    depends_on:
+      - mongodb
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: ecommerce-frontend-dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:3001
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data-dev:

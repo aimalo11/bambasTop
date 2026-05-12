@@ -1,0 +1,66 @@
+const productService = require('../services/productService');
+
+// Crear producto
+const createProduct = async (req, res) => {
+  try {
+    const product = await productService.createProduct(req.body);
+    res.status(201).json({ status: 'success', data: product });
+  } catch (error) {
+    res.status(400).json({ status: 'error', message: error.message });
+  }
+};
+
+// Obtener todos los productos
+const getAllProducts = async (req, res) => {
+  try {
+    const { name, minPrice, maxPrice } = req.query;
+    const products = await productService.getAllProducts({ name, minPrice, maxPrice });
+    res.status(200).json({ status: 'success', data: products });
+  } catch (error) {
+    res.status(400).json({ status: 'error', message: error.message });
+  }
+};
+
+// Obtener producto por id
+const getProductById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const product = await productService.getProductById(id);
+    if (!product) return res.status(404).json({ status: 'error', message: 'Producto no encontrado' });
+    res.status(200).json({ status: 'success', data: product });
+  } catch (error) {
+    res.status(400).json({ status: 'error', message: error.message });
+  }
+};
+
+// Actualizar producto por id
+const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedProduct = await productService.updateProduct(id, req.body);
+    if (!updatedProduct) return res.status(404).json({ status: 'error', message: 'Producto no encontrado' });
+    res.status(200).json({ status: 'success', data: updatedProduct });
+  } catch (error) {
+    res.status(400).json({ status: 'error', message: error.message });
+  }
+};
+
+// Eliminar producto por id
+const deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedProduct = await productService.deleteProduct(id);
+    if (!deletedProduct) return res.status(404).json({ status: 'error', message: 'Producto no encontrado' });
+    res.status(200).json({ status: 'success', message: 'Producto eliminado correctamente' });
+  } catch (error) {
+    res.status(400).json({ status: 'error', message: error.message });
+  }
+};
+
+module.exports = {
+  createProduct,
+  getAllProducts,
+  getProductById,
+  updateProduct,
+  deleteProduct
+};
