@@ -13,10 +13,12 @@ const createProduct = async (req, res) => {
 // Obtener todos los productos
 const getAllProducts = async (req, res) => {
   try {
+    if (req.log) req.log.info({ requestId: req.requestId }, 'Obtenint la llista de productes');
     const { name, minPrice, maxPrice } = req.query;
     const products = await productService.getAllProducts({ name, minPrice, maxPrice });
     res.status(200).json({ status: 'success', data: products });
   } catch (error) {
+    if (req.log) req.log.error({ error: error.message }, 'Error obtenint productes');
     res.status(400).json({ status: 'error', message: error.message });
   }
 };

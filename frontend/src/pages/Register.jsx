@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -54,82 +54,77 @@ export default function Register() {
   };
 
   return (
-    <div style={{ 
-      maxWidth: "400px", 
-      margin: "40px auto", 
-      padding: "20px", 
-      border: "1px solid #ccc", 
-      borderRadius: "8px" 
-    }}>
-      <h2 style={{ textAlign: "center" }}>Registro</h2>
+    <div className="auth-container">
+      <div className="auth-card fade-in">
+        <h2 className="auth-title">Crea un Compte</h2>
 
-      {error && <div style={{ color: 'red', marginBottom: '15px', textAlign: 'center' }}>{error}</div>}
+        {error && <div className="auth-error">{error}</div>}
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "15px" }}>
-          <label>Nom</label><br />
-          <input 
-            type="text" 
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }} 
-          />
+        <form onSubmit={handleSubmit}>
+          <div className="auth-form-group">
+            <label>Nom complet</label>
+            <input 
+              type="text" 
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              placeholder="El teu nom"
+            />
+          </div>
+
+          <div className="auth-form-group">
+            <label>Email</label>
+            <input 
+              type="email" 
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              placeholder="el-teu-email@gmail.com"
+            />
+          </div>
+
+          <div className="auth-form-group">
+            <label>Contrasenya</label>
+            <input 
+              type="password" 
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              placeholder="••••••••"
+            />
+          </div>
+
+          <div className="auth-form-group">
+            <label>Confirmar contrasenya</label>
+            <input 
+              type="password" 
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+              placeholder="••••••••"
+            />
+          </div>
+
+          <button 
+            type="submit"
+            disabled={loading}
+            className="btn btn-primary auth-submit-btn"
+          >
+            {loading ? 'Registrant...' : 'Registrar-se'}
+          </button>
+        </form>
+
+        <div className="auth-footer">
+          Ja tens un compte? 
+          <Link to="/login" className="auth-footer-link">Inicia sessió aquí</Link>
         </div>
-
-        <div style={{ marginBottom: "15px" }}>
-          <label>Email</label><br />
-          <input 
-            type="email" 
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }} 
-          />
-        </div>
-
-        <div style={{ marginBottom: "15px" }}>
-          <label>Contraseña</label><br />
-          <input 
-            type="password" 
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }} 
-          />
-        </div>
-
-        <div style={{ marginBottom: "15px" }}>
-          <label>Repetir contraseña</label><br />
-          <input 
-            type="password" 
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }} 
-          />
-        </div>
-
-        <button 
-          type="submit"
-          disabled={loading}
-          style={{ 
-            width: "100%", 
-            padding: "10px", 
-            backgroundColor: loading ? "#ccc" : "#2196F3", 
-            color: "white", 
-            border: "none",
-            cursor: loading ? "not-allowed" : "pointer"
-          }}
-        >
-          {loading ? 'Registrant...' : 'Registrarse'}
-        </button>
-      </form>
+      </div>
     </div>
   );
 }
+
 

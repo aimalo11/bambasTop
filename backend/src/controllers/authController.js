@@ -6,7 +6,7 @@ const generateTokens = (userId, role) => {
   const accessToken = jwt.sign(
     { id: userId, role },
     process.env.JWT_SECRET || 'secret_key',
-    { expiresIn: '15m' }
+    { expiresIn: '1d' }
   );
 
   const refreshToken = jwt.sign(
@@ -36,8 +36,13 @@ exports.register = async (req, res) => {
       role: 'client' // Per defecte
     });
 
+    if (req.log) {
+      req.log.info({ userId: user._id, email: user.email }, 'User registered successfully');
+    }
+
     res.status(201).json({ message: 'Usuari registrat correctament', userId: user._id });
   } catch (error) {
+    if (req.log) req.log.error({ error: error.message }, 'Error en el registre');
     res.status(500).json({ message: 'Error en el registre', error: error.message });
   }
 };
@@ -48,12 +53,14 @@ exports.login = async (req, res) => {
 
     const user = await Usuari.findOne({ email });
     if (!user) {
+      if (req.log) req.log.warn({ email }, 'Invalid login attempt: user not found');
       return res.status(401).json({ message: 'Email o contrasenya incorrectes' });
     }
 
     // Verificar contrasenya usant el mètode del model
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
+      if (req.log) req.log.warn({ email }, 'Invalid login attempt: incorrect password');
       return res.status(401).json({ message: 'Email o contrasenya incorrectes' });
     }
 
@@ -63,6 +70,10 @@ exports.login = async (req, res) => {
     // Guardar refresh token a la base de dades
     user.refreshToken = refreshToken;
     await user.save();
+
+    if (req.log) {
+      req.log.info({ userId: user._id, email: user.email }, 'User logged in successfully');
+    }
 
     res.json({
       message: 'Login correcte',
@@ -77,6 +88,7 @@ exports.login = async (req, res) => {
     });
 
   } catch (error) {
+    if (req.log) req.log.error({ error: error.message }, 'Error en el login');
     res.status(500).json({ message: 'Error en el login', error: error.message });
   }
 };
@@ -126,8 +138,13 @@ exports.logout = async (req, res) => {
       { new: true }
     );
 
+    if (req.log && user) {
+      req.log.info({ userId: user._id }, 'User logged out');
+    }
+
     res.json({ message: 'Sessió tancada correctament' });
   } catch (error) {
+    if (req.log) req.log.error({ error: error.message }, 'Error en el logout');
     res.status(500).json({ message: 'Error en el logout', error: error.message });
   }
 };

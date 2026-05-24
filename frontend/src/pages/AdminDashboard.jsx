@@ -61,7 +61,10 @@ export default function AdminDashboard() {
             {
                 label: 'Vendes (€)',
                 data: Object.values(salesByDay),
-                backgroundColor: 'rgba(76, 175, 80, 0.6)',
+                backgroundColor: 'rgba(255, 45, 85, 0.55)',
+                borderColor: 'rgba(255, 149, 0, 0.85)',
+                borderWidth: 2,
+                borderRadius: 8,
             },
         ],
     };

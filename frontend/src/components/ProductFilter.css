@@ -1,58 +1,64 @@
 .product-filter {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(12px);
-    padding: 25px;
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    margin-bottom: 40px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    align-items: center;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--card-bg);
+  padding: 20px 24px;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: var(--transition);
+}
+.product-filter:hover {
+  border-color: rgba(255, 255, 255, 0.10);
 }
 
 .product-filter h3 {
-    margin: 0;
-    color: #fff;
-    font-size: 1.2rem;
-    min-width: 100px;
-    font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  min-width: 80px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
 }
 
 .filter-group {
-    display: flex;
-    gap: 15px;
-    flex: 1;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 12px;
+  flex: 1;
+  flex-wrap: wrap;
 }
 
 .filter-input {
-    padding: 12px 20px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #fff;
-    border-radius: 10px;
-    font-family: inherit;
-    transition: var(--transition);
+  padding: 11px 16px;
+  background: rgba(8, 8, 14, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: var(--text-primary);
+  border-radius: var(--border-radius-sm);
+  font-family: inherit;
+  font-size: 0.92rem;
+  transition: var(--transition);
 }
-
-.filter-input::placeholder {
-    color: #888;
-}
-
+.filter-input::placeholder { color: var(--text-muted); }
 .filter-input:focus {
-    border-color: var(--primary-accent);
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
-    background: rgba(0, 0, 0, 0.5);
+  border-color: var(--primary-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 45, 85, 0.12);
+  background: rgba(8, 8, 14, 0.9);
 }
 
-.search-input {
-    flex: 2;
-    min-width: 250px;
-}
+.search-input { flex: 2; min-width: 220px; }
+.price-input { width: 120px; }
 
-.price-input {
-    width: 120px;
+@media (max-width: 768px) {
+  .product-filter {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 18px;
+  }
+  .filter-group { flex-direction: column; }
+  .price-input { width: 100%; }
 }

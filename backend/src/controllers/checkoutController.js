@@ -45,6 +45,14 @@ exports.createSession = async (req, res) => {
                 total,
                 status: 'pending'
             });
+            
+            if (req.log) {
+                req.log.info({
+                    orderId: order._id,
+                    userId,
+                    total
+                }, 'Order created');
+            }
         }
 
         const frontendUrl = buildFrontendUrl();
@@ -70,8 +78,14 @@ exports.createSession = async (req, res) => {
         order.stripeSessionId = session.id;
         await order.save();
 
-        return res.json({ sessionId: session.id, orderId: order._id });
+        return res.json({ sessionId: session.id, sessionUrl: session.url, orderId: order._id });
     } catch (error) {
+        if (req.log) {
+            req.log.error({
+                userId: req.user?.id,
+                error: error.message
+            }, 'Payment session creation failed');
+        }
         return res.status(400).json({ message: 'Error en el pagament', error: error.message });
     }
 };
@@ -107,16 +121,33 @@ exports.webhook = async (req, res) => {
                 for (const item of order.products) {
                     await Product.findByIdAndUpdate(item.product, { $inc: { stock: -item.quantity } });
                 }
+
+                if (req.log) {
+                    req.log.info({
+                        orderId: order._id,
+                        stripeSessionId: session.id
+                    }, 'Payment successful, order paid');
+                }
             }
         }
 
         if (event.type === 'checkout.session.expired') {
             const session = event.data.object;
-            await Order.findOneAndUpdate({ stripeSessionId: session.id }, { status: 'cancelled' });
+            const order = await Order.findOneAndUpdate({ stripeSessionId: session.id }, { status: 'cancelled' });
+            
+            if (req.log && order) {
+                req.log.info({
+                    orderId: order._id,
+                    stripeSessionId: session.id
+                }, 'Payment session expired, order cancelled');
+            }
         }
 
         return res.json({ received: true });
     } catch (error) {
+        if (req.log) {
+            req.log.error({ error: error.message }, 'Webhook processing error');
+        }
         return res.status(500).json({ message: 'Webhook processing error', error: error.message });
     }
 };

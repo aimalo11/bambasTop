@@ -153,29 +153,18 @@ export default function Home() {
     <div className="home-container fade-in">
       <h1 className="main-title slide-down">🔥 Top Bambas Exclusivas 🔥</h1>
 
-      <div className="slide-up" style={{ animationDelay: '0.1s' }}>
+      <div className="slide-up">
         <ProductFilter onFilterChange={setFilters} />
       </div>
 
-      <div className="product-grid slide-up" style={{ animationDelay: '0.2s' }}>
+      <div className="product-grid slide-up">
         {products.map((p) => (
           <div key={p._id} className="product-card">
             <div>
               {/* Product Image */}
-              <div style={{
-                height: '180px',
-                background: '#f0f0f0',
-                borderRadius: '8px',
-                marginBottom: '15px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#aaa',
-                fontSize: '3rem',
-                overflow: 'hidden'
-              }}>
+              <div className="product-image-container">
                 {p.image ? (
-                  <img src={p.image.startsWith('http') ? p.image : `/images/${p.image}`} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  <img src={p.image.startsWith('http') ? p.image : `/images/${p.image}`} alt={p.name} />
                 ) : (
                   '👟'
                 )}
@@ -185,7 +174,7 @@ export default function Home() {
                 {p.category || 'General'}
               </div>
               <p className="product-price">{p.price}€</p>
-              {p.description && <p style={{ color: '#aaa', fontSize: '0.85em', marginTop: '10px' }}>{p.description.substring(0, 50)}...</p>}
+              {p.description && <p className="product-description">{p.description.substring(0, 70)}...</p>}
             </div>
 
             <div className="product-actions">
@@ -203,25 +192,28 @@ export default function Home() {
       {/* Cart UI */}
       <div className={`cart-container ${isCartOpen ? 'cart-open' : 'cart-closed'}`}>
         {/* Floating Button / Cart Header */}
-        <div onClick={toggleCart} className="cart-header" style={{ cursor: 'pointer' }}>
+        <div onClick={toggleCart} className="cart-header">
           <span className="cart-title">
-            🛒 {isCartOpen ? 'La teva cistella' : ''} {cart.length > 0 && `(${cart.length})`}
+            {isCartOpen ? 'La teva cistella' : '🛒 El meu carrito'} {cart.length > 0 && `(${cart.length})`}
           </span>
-          <span style={{ fontSize: '1.5rem' }}>{isCartOpen ? "✕" : "🛒"}</span>
+          <span className="cart-close-icon">{isCartOpen ? "✕" : ""}</span>
         </div>
 
         {/* Unfolded Content */}
         <div className="cart-body">
           {cart.length === 0 ? (
-            <p className="empty-cart-msg">La cistella està buida.</p>
+            <div className="empty-cart-msg">
+              <span className="empty-cart-icon">🛒</span>
+              <p>La cistella està buida.</p>
+            </div>
           ) : (
             <>
               <ul className="cart-list">
                 {cart.map((item, index) => (
                   <li key={item._id || index} className="cart-item">
-                    <div>
-                      <div style={{ fontWeight: 'bold' }}>{item.nombre}</div>
-                      <div style={{ color: '#666', fontSize: '0.9em' }}>
+                    <div className="cart-item-info">
+                      <div className="cart-item-name">{item.nombre}</div>
+                      <div className="cart-item-price">
                         {item.precio}€ x {item.quantity || 1}
                       </div>
                     </div>

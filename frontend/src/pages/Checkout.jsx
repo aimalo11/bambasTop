@@ -88,17 +88,11 @@ export default function Checkout() {
             });
 
             const sessionData = await sessionResponse.json().catch(() => ({}));
-            if (!sessionResponse.ok || !sessionData.sessionId) {
+            if (!sessionResponse.ok || !sessionData.sessionUrl) {
                 throw new Error(sessionData.message || 'No s\'ha pogut iniciar Stripe Checkout');
             }
 
-            const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
-            if (!stripe) throw new Error('No s\'ha pogut carregar Stripe');
-
-            const result = await stripe.redirectToCheckout({ sessionId: sessionData.sessionId });
-            if (result?.error) {
-                throw new Error(result.error.message || 'Error redirigint a Stripe');
-            }
+            window.location.href = sessionData.sessionUrl;
         } catch (err) {
             setError(err.message || 'Error en el pagament');
         } finally {

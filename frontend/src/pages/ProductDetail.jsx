@@ -86,24 +86,26 @@ export default function ProductDetail() {
             </div>
 
             <div className="detail-info">
+                <span className="detail-category-label">{product.category || 'General'}</span>
                 <h1 className="detail-title">{product.name}</h1>
-                <div className="detail-meta">
-                    <span className="chip category-chip">{product.category || 'General'}</span>
-                    <span className="chip sku-chip">SKU: {product.sku || 'N/A'}</span>
-                    <span className="chip stock-chip">Estoc: {product.stock}</span>
-                </div>
-
-                <p className="detail-price">{product.price}€</p>
+                <p className="detail-subtitle">Sabatilles · Estoc: {product.stock} unitats</p>
+                
+                <p className="detail-price">{product.price},00 €</p>
 
                 <div className="detail-description">
                     <p>{product.description || "Sense descripció disponible per aquest producte."}</p>
+                </div>
+
+                <div className="detail-meta">
+                    <span className="chip sku-chip">SKU: {product.sku || 'N/A'}</span>
+                    <span className="chip stock-chip">En estoc</span>
                 </div>
 
                 <div className="detail-actions">
                     <button
                         onClick={addToCart}
                         className="btn btn-primary"
-                        style={{ flex: 1, padding: '15px' }}
+                        style={{ flex: 1, padding: '16px' }}
                     >
                         Afegir a la cistella
                     </button>

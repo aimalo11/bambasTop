@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -43,55 +43,50 @@ export default function Login() {
   };
 
   return (
-    <div style={{ 
-      maxWidth: "400px", 
-      margin: "40px auto", 
-      padding: "20px", 
-      border: "1px solid #ccc", 
-      borderRadius: "8px" 
-    }}>
-      <h2 style={{ textAlign: "center" }}>Login</h2>
+    <div className="auth-container">
+      <div className="auth-card fade-in">
+        <h2 className="auth-title">Iniciar Sessió</h2>
 
-      {error && <div style={{ color: 'red', marginBottom: '15px', textAlign: 'center' }}>{error}</div>}
+        {error && <div className="auth-error">{error}</div>}
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "15px" }}>
-          <label>Email</label><br />
-          <input 
-            type="email" 
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }} 
-          />
+        <form onSubmit={handleSubmit}>
+          <div className="auth-form-group">
+            <label>Email</label>
+            <input 
+              type="email" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="el-teu-email@gmail.com"
+            />
+          </div>
+
+          <div className="auth-form-group">
+            <label>Contrasenya</label>
+            <input 
+              type="password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              placeholder="••••••••"
+            />
+          </div>
+
+          <button 
+            type="submit"
+            disabled={loading}
+            className="btn btn-primary auth-submit-btn"
+          >
+            {loading ? 'Entrant...' : 'Entrar'}
+          </button>
+        </form>
+
+        <div className="auth-footer">
+          No tens un compte? 
+          <Link to="/register" className="auth-footer-link">Registra't aquí</Link>
         </div>
-
-        <div style={{ marginBottom: "15px" }}>
-          <label>Contraseña</label><br />
-          <input 
-            type="password" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }} 
-          />
-        </div>
-
-        <button 
-          type="submit"
-          disabled={loading}
-          style={{ 
-            width: "100%", 
-            padding: "10px", 
-            backgroundColor: loading ? "#ccc" : "#4CAF50", 
-            color: "white", 
-            border: "none",
-            cursor: loading ? "not-allowed" : "pointer"
-          }}
-        >
-          {loading ? 'Entrant...' : 'Entrar'}
-        </button>
-      </form>
+      </div>
     </div>
   );
 }
+
