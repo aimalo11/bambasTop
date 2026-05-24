@@ -156,6 +156,16 @@ a:hover { color: var(--secondary-accent); }
   box-shadow: 0 8px 22px rgba(255, 59, 48, 0.5);
 }
 
+.btn-success {
+  background: linear-gradient(135deg, #34c759 0%, #28a745 100%);
+  color: white;
+  box-shadow: 0 4px 14px rgba(52, 199, 89, 0.3);
+}
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(52, 199, 89, 0.5);
+}
+
 /* Form Elements */
 input[type="text"],
 input[type="email"],

@@ -37,33 +37,43 @@ export default function ProductDetail() {
         }
     }, [id]);
 
+    const [added, setAdded] = useState(false);
+
     const addToCart = () => {
         if (!product) return;
 
-        const cartItem = {
-            productoId: product._id,
-            nombre: product.name,
-            precio: Number(product.price)
-        };
+        const token = localStorage.getItem('accessToken');
+        const item = { productoId: String(product._id) };
 
         fetch('/api/cart/add', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(cartItem)
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(item)
         })
             .then(res => {
                 if (!res.ok) throw new Error("Server error");
                 return res.json();
             })
             .then(() => {
-                alert("Producte afegit a la cistella! 🛒");
+                setAdded(true);
+                setTimeout(() => setAdded(false), 2000);
             })
             .catch(err => {
                 console.error("Backend failed, using localStorage:", err);
+                const cartItem = { productoId: product._id, nombre: product.name, precio: Number(product.price), quantity: 1 };
                 const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
-                localCart.push({ ...cartItem, _id: Date.now().toString() });
+                const existing = localCart.find(c => c.productoId === product._id);
+                if (existing) {
+                    existing.quantity = (existing.quantity || 1) + 1;
+                } else {
+                    localCart.push({ ...cartItem, _id: Date.now().toString() });
+                }
                 localStorage.setItem('cart', JSON.stringify(localCart));
-                alert("Producte afegit a la cistella (mode local)! 🛒");
+                setAdded(true);
+                setTimeout(() => setAdded(false), 2000);
             });
     };
 
@@ -104,10 +114,10 @@ export default function ProductDetail() {
                 <div className="detail-actions">
                     <button
                         onClick={addToCart}
-                        className="btn btn-primary"
+                        className={`btn ${added ? 'btn-success' : 'btn-primary'}`}
                         style={{ flex: 1, padding: '16px' }}
                     >
-                        Afegir a la cistella
+                        {added ? '✓ Afegit a la cistella!' : '🛒 Afegir a la cistella'}
                     </button>
                 </div>
             </div>
